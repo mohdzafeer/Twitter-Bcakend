@@ -138,8 +138,8 @@ app.post("/subscription", async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: 'https://zafeer-tweeter-intern-nullclass.vercel.app/success',
-      cancel_url: 'https://zafeer-tweeter-intern-nullclass.vercel.app/failed',
+      success_url: 'https://zafeer-tweeter-intern-nullclass.vercel.app/premium/success',
+      cancel_url: 'https://zafeer-tweeter-intern-nullclass.vercel.app/premium/failed',
       shipping_address_collection: {
         allowed_countries: ['US', 'CA','IN'], 
       },
