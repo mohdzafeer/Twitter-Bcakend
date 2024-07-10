@@ -5,7 +5,9 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+
 const stripe = require('stripe')('sk_test_51PVSykSHdQrv9A9OnRTK9aUqhrqg0sYIdLha5NEJypJlNilqHye25OjuVLsmVEXqGVf4M4XEWCKvuzgWEsovWTiG00JI7Mitfl');
+// const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 
 
 const port = process.env.PORT || 5000
@@ -16,7 +18,8 @@ app.use(bodyParser.json());
 
 require('dotenv').config();
 
-const uri = process.env.MONGODB_URI;
+// const uri = process.env.MONGODB_URI;
+const uri = "mongodb+srv://mohammadzafeer2610:YmtVYyVXTgKTNY08@cluster0.a2s332e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
