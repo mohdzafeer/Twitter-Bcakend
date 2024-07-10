@@ -141,8 +141,8 @@ app.post("/subscription", async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: 'https://zafeer-tweeter-intern-nullclass-3qkxkwgf2.vercel.app/premium/success',
-      cancel_url: 'https://zafeer-tweeter-intern-nullclass-3qkxkwgf2.vercel.app/spremium/failed',
+      success_url: 'https://zafeer-twitter-nullclass-i-git-b91145-mohammad-zafeers-projects.vercel.app/premium/success',
+      cancel_url: 'https://zafeer-twitter-nullclass-i-git-b91145-mohammad-zafeers-projects.vercel.app/premium/failed',
       shipping_address_collection: {
         allowed_countries: ['US', 'CA','IN'], 
       },
