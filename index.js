@@ -6,11 +6,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-
-// const stripe = require('stripe')('sk_test_51PVSykSHdQrv9A9OnRTK9aUqhrqg0sYIdLha5NEJypJlNilqHye25OjuVLsmVEXqGVf4M4XEWCKvuzgWEsovWTiG00JI7Mitfl');
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
-
-
 const port = process.env.PORT || 5000
 
 app.use(cors());
@@ -19,9 +15,6 @@ app.use(bodyParser.json());
 
 
 const uri = process.env.MONGODB_URI;
-// const uri = "mongodb+srv://mohammadzafeer2610:YmtVYyVXTgKTNY08@cluster0.a2s332e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -71,7 +64,7 @@ async function run() {
       res.send(result);
     })
 
-    
+
 
 
 
@@ -87,6 +80,38 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc, options)
       res.send(result)
     })
+
+
+
+
+    app.post('/lastUser', async (req, res) => {
+      try {
+        const database = client.db('database'); 
+        const collectionName = 'lastUser'; 
+        const userCollection = database.collection(collectionName);
+    
+        const newData = req.body;
+    
+        const result = await userCollection.insertOne(newData);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: 'Error adding data', error });
+      }
+    });
+    
+
+    app.get('/lastUser', async (req, res) => {
+      try {
+        const database = client.db('database'); 
+        const collectionName = 'lastUser'; 
+        const userCollection = database.collection(collectionName);
+    
+        const data = (await userCollection.find({}).toArray()).reverse();
+        res.send(data);
+      } catch (error) {
+        res.status(500).send({ message: 'Error fetching data', error });
+      }
+    });
 
 
 
@@ -113,7 +138,7 @@ app.get('/', (req, res) => {
 });
 
 app.post("/subscription", async (req, res) => {
-    const { amount } = req.body; 
+  const { amount } = req.body;
   try {
     const product = await stripe.products.create({
       name: 'Twitter Subscription Plan',
@@ -129,11 +154,11 @@ app.post("/subscription", async (req, res) => {
 
 
 
-    
+
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      
+
       line_items: [
         {
           price: price.id,
@@ -144,13 +169,13 @@ app.post("/subscription", async (req, res) => {
       success_url: 'https://zafeer-twitter-nullclass-i-git-b91145-mohammad-zafeers-projects.vercel.app/premium/success',
       cancel_url: 'https://zafeer-twitter-nullclass-i-git-b91145-mohammad-zafeers-projects.vercel.app/premium/failed',
       shipping_address_collection: {
-        allowed_countries: ['US', 'CA','IN'], 
+        allowed_countries: ['US', 'CA', 'IN'],
       },
     });
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     res.status(500).send('Server Error');
   }
 });
@@ -169,8 +194,8 @@ let otpStore = {};
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-      user: 'twitter.nullclass.zafeer.intern@gmail.com',
-      pass: 'itcmrfoddwsfirti'
+    user: 'twitter.nullclass.zafeer.intern@gmail.com',
+    pass: 'itcmrfoddwsfirti'
   }
 });
 
@@ -180,28 +205,28 @@ const transporter = nodemailer.createTransport({
 app.post('/send-otp', (req, res) => {
   const { email } = req.body;
   if (!email) {
-      return res.status(400).send({ error: 'Email is required' });
+    return res.status(400).send({ error: 'Email is required' });
   }
 
   const otp = generateOTP();
   otpStore[email] = otp;
 
   const mailOptions = {
-          from: 'twitter.nullclass.zafeer.intern@gmail.com',
-          to: email,
-          subject: 'Your OTP Code',
-          text: `Your OTP code is ${otp}`
-      };
-    
-      transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-              console.error('Error sending OTP email:', error);
-              return res.status(500).send({ error: 'Failed to send email' });
-          }
-          res.status(200).send({ message: 'OTP sent' });
-          
-      });
-  
+    from: 'twitter.nullclass.zafeer.intern@gmail.com',
+    to: email,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is ${otp}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending OTP email:', error);
+      return res.status(500).send({ error: 'Failed to send email' });
+    }
+    res.status(200).send({ message: 'OTP sent' });
+
+  });
+
   console.log(`Generated OTP for ${email}: ${otp}`);
   console.log('Current OTP Store:', otpStore);
 
@@ -213,19 +238,19 @@ app.post('/verify-otp', (req, res) => {
 
   console.log('Received payload:', req.body);
 
-  
+
 
   const storedOtp = otpStore[email];
   console.log(`Stored OTP for ${email}: ${storedOtp}, Received OTP: ${otp}`);
 
   if (storedOtp && storedOtp === otp) {
-      delete otpStore[email];
-      return res.status(200).send({ message: 'OTP verified' });
-      
+    delete otpStore[email];
+    return res.status(200).send({ message: 'OTP verified' });
+
   }
-  else{
+  else {
     res.status(400).send({ error: 'Invalid OTP' });
-    
+
   }
 });
 
