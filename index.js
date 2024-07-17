@@ -138,10 +138,12 @@ app.get('/', (req, res) => {
 });
 
 app.post("/subscription", async (req, res) => {
-  const { amount } = req.body;
+  const { amount,plan_name,details } = req.body;
   try {
     const product = await stripe.products.create({
-      name: 'Twitter Subscription Plan',
+      name: `${plan_name}`,
+      description:`${details}`, 
+      images:[`https://i.ibb.co/GvgZLLD/favicon.webp`],      
       type: 'service',
     });
 
@@ -152,10 +154,6 @@ app.post("/subscription", async (req, res) => {
     });
 
 
-
-
-
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
 
@@ -163,6 +161,8 @@ app.post("/subscription", async (req, res) => {
         {
           price: price.id,
           quantity: 1,
+          // description:`Basic Plan \n Boost small reply`
+          // price_data:`Basic Plan`
         },
       ],
       mode: 'payment',
